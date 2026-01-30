@@ -164,6 +164,17 @@ export function Step5Evaluations() {
                     {evaluation.question && evaluation.expectedResponse && (
                       <CheckCircle className="w-5 h-5 text-success" />
                     )}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeEvaluation(evaluation.id);
+                      }}
+                      className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
                     {expandedEvals[evaluation.id] ? (
                       <ChevronUp className="w-5 h-5 text-muted-foreground" />
                     ) : (
@@ -175,18 +186,6 @@ export function Step5Evaluations() {
 
               <CollapsibleContent>
                 <div className="p-6 space-y-6 border-t border-border bg-card/50">
-                  <div className="flex justify-end">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeEvaluation(evaluation.id)}
-                      disabled={evaluations.length <= 0}
-                      className="text-muted-foreground hover:text-destructive"
-                    >
-                      <X className="w-4 h-4 mr-2" />
-                      Remove
-                    </Button>
-                  </div>
 
                   <div className="grid gap-4">
                     <div className="space-y-2">
