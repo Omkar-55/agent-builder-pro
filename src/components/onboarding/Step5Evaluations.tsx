@@ -24,14 +24,14 @@ export function Step5Evaluations() {
   const evaluations = formData.evaluations;
   const agents = formData.agentNetwork.agents;
   const [expandedEvals, setExpandedEvals] = useState<Record<string, boolean>>({});
-  const [numEvals, setNumEvals] = useState(Math.max(4, evaluations.length));
+  const [numEvals, setNumEvals] = useState(evaluations.length);
 
   const toggleEval = (evalId: string) => {
     setExpandedEvals((prev) => ({ ...prev, [evalId]: !prev[evalId] }));
   };
 
   const handleNumEvalsChange = (num: number) => {
-    if (num < 4) return; // Minimum 4 evals
+    if (num < 0) return;
     setNumEvals(num);
     const currentCount = evaluations.length;
 
@@ -69,7 +69,7 @@ export function Step5Evaluations() {
   };
 
   const removeEvaluation = (evalId: string) => {
-    if (evaluations.length <= 4) return;
+    if (evaluations.length <= 0) return;
     setFormData((prev) => ({
       ...prev,
       evaluations: prev.evaluations.filter((e) => e.id !== evalId),
@@ -82,11 +82,6 @@ export function Step5Evaluations() {
       .filter((a) => selectedAgentIds.includes(a.id))
       .flatMap((a) => a.tools);
   };
-
-  // Initialize evaluations if empty
-  if (evaluations.length === 0) {
-    handleNumEvalsChange(4);
-  }
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 animate-fade-in">
@@ -116,14 +111,14 @@ export function Step5Evaluations() {
         <div className="flex items-center justify-between">
           <div>
             <Label className="text-lg">Number of Evaluations</Label>
-            <p className="text-sm text-muted-foreground mt-1">Minimum 4 required</p>
+            <p className="text-sm text-muted-foreground mt-1">Minimum 4 required before submission</p>
           </div>
           <div className="flex items-center gap-3">
             <Button
               variant="outline"
               size="icon"
-              onClick={() => handleNumEvalsChange(Math.max(4, numEvals - 1))}
-              disabled={numEvals <= 4}
+              onClick={() => handleNumEvalsChange(Math.max(0, numEvals - 1))}
+              disabled={numEvals <= 0}
             >
               -
             </Button>
@@ -185,7 +180,7 @@ export function Step5Evaluations() {
                       variant="ghost"
                       size="sm"
                       onClick={() => removeEvaluation(evaluation.id)}
-                      disabled={evaluations.length <= 4}
+                      disabled={evaluations.length <= 0}
                       className="text-muted-foreground hover:text-destructive"
                     >
                       <X className="w-4 h-4 mr-2" />
