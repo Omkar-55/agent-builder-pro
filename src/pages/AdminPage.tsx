@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Clock, CheckCircle, FileEdit, Trash2, Eye } from 'lucide-react';
+import { Plus, Clock, CheckCircle, FileEdit, Trash2, Eye, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { RapidLogo } from '@/components/RapidLogo';
 import { OnboardingSession } from '@/types/onboarding';
@@ -116,16 +116,23 @@ export default function AdminPage() {
               const status = statusConfig[session.status];
               const StatusIcon = status.icon;
               const progress = Math.round((session.currentStep / 6) * 100);
+              const isCompleted = session.status === 'completed';
 
               return (
                 <div
                   key={session.id}
-                  className="p-6 rounded-xl bg-card border border-border hover:border-primary/30 transition-colors"
+                  className={`p-6 rounded-xl bg-card border border-border transition-colors ${
+                    isCompleted ? 'opacity-75' : 'hover:border-primary/30'
+                  }`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                        <span className="text-primary font-bold text-lg">
+                      <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
+                        isCompleted ? 'bg-success/10' : 'bg-primary/10'
+                      }`}>
+                        <span className={`font-bold text-lg ${
+                          isCompleted ? 'text-success' : 'text-primary'
+                        }`}>
                           {session.name.charAt(0)}
                         </span>
                       </div>
@@ -146,13 +153,17 @@ export default function AdminPage() {
                           <span className="text-sm text-muted-foreground">
                             Step {session.currentStep}/6
                           </span>
-                          <span className="text-sm font-medium text-primary">
+                          <span className={`text-sm font-medium ${
+                            isCompleted ? 'text-success' : 'text-primary'
+                          }`}>
                             {progress}%
                           </span>
                         </div>
                         <div className="w-32 h-2 rounded-full bg-muted overflow-hidden">
                           <div
-                            className="h-full progress-bar rounded-full transition-all duration-300"
+                            className={`h-full rounded-full transition-all duration-300 ${
+                              isCompleted ? 'bg-success' : 'progress-bar'
+                            }`}
                             style={{ width: `${progress}%` }}
                           />
                         </div>
@@ -168,19 +179,33 @@ export default function AdminPage() {
 
                       {/* Actions */}
                       <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="icon" asChild>
-                          <Link to="/">
+                        {isCompleted ? (
+                          <Button variant="outline" size="sm" disabled className="gap-2 opacity-50 cursor-not-allowed">
                             <Eye className="w-4 h-4" />
-                          </Link>
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDelete(session.id)}
-                          className="text-muted-foreground hover:text-destructive"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
+                            View Only
+                          </Button>
+                        ) : (
+                          <>
+                            <Button 
+                              asChild 
+                              size="sm" 
+                              className="gap-2 bg-gradient-primary hover:opacity-90"
+                            >
+                              <Link to="/">
+                                Continue
+                                <ArrowRight className="w-4 h-4" />
+                              </Link>
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleDelete(session.id)}
+                              className="text-muted-foreground hover:text-destructive"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </>
+                        )}
                       </div>
                     </div>
                   </div>
