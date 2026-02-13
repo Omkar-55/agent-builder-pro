@@ -145,7 +145,7 @@ export const DEFAULT_DOCUMENTS: DocumentUploadItem[] = [
   },
   {
     id: 'agents-tools',
-    label: 'Agents-Tools Description & Mapping Document',
+    label: 'Agents-Tool Description & Evaluations',
     description: 'Preferred as the recommended template format',
     acceptedFormats: ['.xlsx', '.docx'],
     acceptExtensions: '.xlsx,.docx',
