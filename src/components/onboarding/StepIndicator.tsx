@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 const steps = [
   { number: 1, title: 'Card Details' },
   { number: 2, title: 'Business Overview' },
-  { number: 3, title: 'Documents' },
+  { number: 3, title: 'Documents and Prompts' },
   { number: 4, title: 'Data Upload' },
   { number: 5, title: 'Frontend Portal' },
 ];
