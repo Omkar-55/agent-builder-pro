@@ -136,12 +136,11 @@ export function Step4AgentNetwork() {
               {doc.referenceLink && (
                 <a
                   href={doc.referenceLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  download
                   className="inline-flex items-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors"
                 >
                   <ExternalLink className="w-4 h-4" />
-                  View Reference Template
+                  Download Reference Template
                 </a>
               )}
             </div>

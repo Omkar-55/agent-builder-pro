@@ -1,0 +1,16 @@
+{
+  "agents": [
+    {
+      "name": "Agent 1",
+      "instructions": "Describe the agent's role and responsibilities.",
+      "tools": [
+        {
+          "name": "Tool 1",
+          "category": "Data Retrieval",
+          "dataSource": "",
+          "instructions": "Describe what this tool does."
+        }
+      ]
+    }
+  ]
+}
