@@ -148,25 +148,6 @@ export function Step4AgentNetwork() {
           </div>
         ))}
       </div>
-
-      {/* Add Document Buttons */}
-      <div className="p-5 rounded-xl border border-dashed border-border bg-secondary/20 space-y-3">
-        <Label className="text-sm text-muted-foreground">Add another document:</Label>
-        <div className="flex flex-wrap gap-2">
-          {DEFAULT_DOCUMENTS.map((template) => (
-            <Button
-              key={template.id}
-              variant="outline"
-              size="sm"
-              onClick={() => addDocument(template)}
-              className="gap-2"
-            >
-              <FileText className="w-4 h-4" />
-              {template.label}
-            </Button>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }
