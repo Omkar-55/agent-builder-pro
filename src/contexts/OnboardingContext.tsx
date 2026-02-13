@@ -18,15 +18,24 @@ const OnboardingContext = createContext<OnboardingContextType | undefined>(undef
 
 export function OnboardingProvider({ children }: { children: React.ReactNode }) {
   const [formData, setFormData] = useState<OnboardingFormData>(() => {
-    const saved = localStorage.getItem('rapid-onboarding-form');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      const merged = { ...initialFormData, ...parsed };
-      // Cap evaluations to prevent bloated localStorage data
-      if (merged.evaluations && merged.evaluations.length > 5) {
-        merged.evaluations = merged.evaluations.slice(0, 5);
+    try {
+      const saved = localStorage.getItem('rapid-onboarding-form');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        const merged = { ...initialFormData, ...parsed };
+        // Ensure documentUploads exists
+        if (!merged.documentUploads) {
+          merged.documentUploads = initialFormData.documentUploads;
+        }
+        // Cap evaluations to prevent bloated localStorage data
+        if (merged.evaluations && merged.evaluations.length > 5) {
+          merged.evaluations = merged.evaluations.slice(0, 5);
+        }
+        return merged;
       }
-      return merged;
+    } catch (e) {
+      console.error('Failed to parse saved form data:', e);
+      localStorage.removeItem('rapid-onboarding-form');
     }
     return initialFormData;
   });
