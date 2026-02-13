@@ -19,7 +19,11 @@ const OnboardingContext = createContext<OnboardingContextType | undefined>(undef
 export function OnboardingProvider({ children }: { children: React.ReactNode }) {
   const [formData, setFormData] = useState<OnboardingFormData>(() => {
     const saved = localStorage.getItem('rapid-onboarding-form');
-    return saved ? JSON.parse(saved) : initialFormData;
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      return { ...initialFormData, ...parsed };
+    }
+    return initialFormData;
   });
 
   const [currentStep, setCurrentStep] = useState(() => {
