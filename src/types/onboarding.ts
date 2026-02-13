@@ -140,7 +140,7 @@ export const DEFAULT_DOCUMENTS: DocumentUploadItem[] = [
     acceptedFormats: ['.xlsx', '.docx'],
     acceptExtensions: '.xlsx,.docx',
     fileName: null,
-    referenceLink: '',
+    referenceLink: 'https://docs.example.com/templates/business-process-overview',
     isRecommendedTemplate: true,
   },
   {
@@ -150,7 +150,7 @@ export const DEFAULT_DOCUMENTS: DocumentUploadItem[] = [
     acceptedFormats: ['.xlsx', '.docx'],
     acceptExtensions: '.xlsx,.docx',
     fileName: null,
-    referenceLink: '',
+    referenceLink: 'https://docs.example.com/templates/agents-tools-mapping',
     isRecommendedTemplate: true,
   },
   {
@@ -160,7 +160,7 @@ export const DEFAULT_DOCUMENTS: DocumentUploadItem[] = [
     acceptedFormats: ['.txt'],
     acceptExtensions: '.txt',
     fileName: null,
-    referenceLink: '',
+    referenceLink: 'https://docs.example.com/templates/data-reference',
     isRecommendedTemplate: false,
   },
   {
@@ -170,7 +170,7 @@ export const DEFAULT_DOCUMENTS: DocumentUploadItem[] = [
     acceptedFormats: ['.csv'],
     acceptExtensions: '.csv',
     fileName: null,
-    referenceLink: '',
+    referenceLink: 'https://docs.example.com/templates/system-prompt-reference',
     isRecommendedTemplate: false,
   },
 ];

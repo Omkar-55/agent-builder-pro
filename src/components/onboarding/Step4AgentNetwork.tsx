@@ -141,17 +141,17 @@ export function Step4AgentNetwork() {
               )}
 
               {/* Reference link */}
-              <div className="flex items-center gap-2">
-                <ExternalLink className="w-4 h-4 text-muted-foreground shrink-0" />
-                <Label className="text-sm text-muted-foreground shrink-0">Reference:</Label>
-                <input
-                  type="url"
-                  value={doc.referenceLink}
-                  onChange={(e) => updateDocument(doc.id, { referenceLink: e.target.value })}
-                  placeholder="Paste reference link here..."
-                  className="flex-1 text-sm bg-transparent border-b border-border focus:border-primary outline-none py-1 text-foreground placeholder:text-muted-foreground/50 transition-colors"
-                />
-              </div>
+              {doc.referenceLink && (
+                <a
+                  href={doc.referenceLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  View Reference Template
+                </a>
+              )}
             </div>
           </div>
         ))}
