@@ -133,16 +133,30 @@ export function Step4AgentNetwork() {
               )}
 
               {/* Reference link */}
-              {doc.referenceLink && (
+              {doc.referenceLink && doc.referenceLink.startsWith('/') ? (
                 <a
                   href={doc.referenceLink}
                   download
                   className="inline-flex items-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors"
                 >
                   <ExternalLink className="w-4 h-4" />
-                  Download Reference Template
+                  {doc.id === 'system-prompt'
+                    ? 'Download Reference System Prompt'
+                    : doc.id === 'agent-tool-prompt'
+                    ? 'Download Reference Agent and Tool Prompt'
+                    : 'Download Reference Template'}
                 </a>
-              )}
+              ) : doc.referenceLink ? (
+                <a
+                  href={doc.referenceLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  View Reference Template
+                </a>
+              ) : null}
             </div>
           </div>
         ))}
