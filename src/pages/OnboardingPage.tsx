@@ -6,11 +6,10 @@ import { Step1CardDetails } from '@/components/onboarding/Step1CardDetails';
 import { Step2BusinessOverview } from '@/components/onboarding/Step2BusinessOverview';
 import { Step3DataUpload } from '@/components/onboarding/Step3DataUpload';
 import { Step4AgentNetwork } from '@/components/onboarding/Step4AgentNetwork';
-import { Step5Evaluations } from '@/components/onboarding/Step5Evaluations';
 import { Step6FrontendPortal } from '@/components/onboarding/Step6FrontendPortal';
 import { RapidLogo } from '@/components/RapidLogo';
 
-const TOTAL_STEPS = 6;
+const TOTAL_STEPS = 5;
 
 function OnboardingFormContent() {
   const { currentStep, setCurrentStep, saveProgress, formData } = useOnboarding();
@@ -54,12 +53,10 @@ function OnboardingFormContent() {
       case 2:
         return <Step2BusinessOverview />;
       case 3:
-        return <Step3DataUpload />;
-      case 4:
         return <Step4AgentNetwork />;
+      case 4:
+        return <Step3DataUpload />;
       case 5:
-        return <Step5Evaluations />;
-      case 6:
         return <Step6FrontendPortal />;
       default:
         return <Step1CardDetails />;
