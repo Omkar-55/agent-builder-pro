@@ -1,406 +1,178 @@
-import { useState } from 'react';
-import { Plus, X, Bot, Wrench, ChevronDown, ChevronUp, Crown, Info } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { useRef } from 'react';
+import { Upload, X, FileText, ExternalLink, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible';
+import { Label } from '@/components/ui/label';
 import { useOnboarding } from '@/contexts/OnboardingContext';
-import { Agent, Tool, TOOL_CATEGORIES } from '@/types/onboarding';
+import { DocumentUploadItem, DEFAULT_DOCUMENTS } from '@/types/onboarding';
 
 export function Step4AgentNetwork() {
-  const { formData, setFormData, updateFormData } = useOnboarding();
-  const { agents, supervisorAgent } = formData.agentNetwork;
-  const allFiles = [
-    ...formData.dataUpload.structuredData.map((f) => f.fileName),
-    ...formData.dataUpload.unstructuredData.map((f) => f.fileName),
-    'Web Link',
-    'MCP',
-  ];
+  const { formData, setFormData } = useOnboarding();
+  const { documents } = formData.documentUploads;
+  const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
-  const [expandedAgents, setExpandedAgents] = useState<Record<string, boolean>>({});
-  const [numAgents, setNumAgents] = useState(agents.length);
-
-  const toggleAgent = (agentId: string) => {
-    setExpandedAgents((prev) => ({ ...prev, [agentId]: !prev[agentId] }));
-  };
-
-  const handleNumAgentsChange = (num: number) => {
-    setNumAgents(num);
-    const currentCount = agents.length;
-
-    if (num > currentCount) {
-      const newAgents: Agent[] = [];
-      for (let i = currentCount; i < num; i++) {
-        newAgents.push({
-          id: crypto.randomUUID(),
-          name: `Agent ${i + 1}`,
-          instructions: '',
-          tools: [],
-        });
-      }
-      setFormData((prev) => ({
-        ...prev,
-        agentNetwork: {
-          ...prev.agentNetwork,
-          agents: [...prev.agentNetwork.agents, ...newAgents],
-        },
-      }));
-    } else if (num < currentCount) {
-      setFormData((prev) => ({
-        ...prev,
-        agentNetwork: {
-          ...prev.agentNetwork,
-          agents: prev.agentNetwork.agents.slice(0, num),
-        },
-      }));
-    }
-  };
-
-  const updateAgent = (agentId: string, updates: Partial<Agent>) => {
+  const updateDocument = (docId: string, updates: Partial<DocumentUploadItem>) => {
     setFormData((prev) => ({
       ...prev,
-      agentNetwork: {
-        ...prev.agentNetwork,
-        agents: prev.agentNetwork.agents.map((a) =>
-          a.id === agentId ? { ...a, ...updates } : a
+      documentUploads: {
+        ...prev.documentUploads,
+        documents: prev.documentUploads.documents.map((d) =>
+          d.id === docId ? { ...d, ...updates } : d
         ),
       },
     }));
   };
 
-  const addToolToAgent = (agentId: string) => {
-    const newTool: Tool = {
-      id: crypto.randomUUID(),
-      name: '',
-      dataSource: [],
-      category: '',
-      instructions: '',
+  const handleFileSelect = (docId: string, file: File | null) => {
+    updateDocument(docId, { fileName: file?.name || null });
+  };
+
+  const removeDocument = (docId: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      documentUploads: {
+        ...prev.documentUploads,
+        documents: prev.documentUploads.documents.filter((d) => d.id !== docId),
+      },
+    }));
+  };
+
+  const addDocument = (template: DocumentUploadItem) => {
+    const newDoc: DocumentUploadItem = {
+      ...template,
+      id: `${template.id}-${crypto.randomUUID().slice(0, 8)}`,
+      fileName: null,
+      referenceLink: '',
     };
     setFormData((prev) => ({
       ...prev,
-      agentNetwork: {
-        ...prev.agentNetwork,
-        agents: prev.agentNetwork.agents.map((a) =>
-          a.id === agentId ? { ...a, tools: [...a.tools, newTool] } : a
-        ),
+      documentUploads: {
+        ...prev.documentUploads,
+        documents: [...prev.documentUploads.documents, newDoc],
       },
     }));
-  };
-
-  const updateTool = (agentId: string, toolId: string, updates: Partial<Tool>) => {
-    setFormData((prev) => ({
-      ...prev,
-      agentNetwork: {
-        ...prev.agentNetwork,
-        agents: prev.agentNetwork.agents.map((a) =>
-          a.id === agentId
-            ? {
-                ...a,
-                tools: a.tools.map((t) => (t.id === toolId ? { ...t, ...updates } : t)),
-              }
-            : a
-        ),
-      },
-    }));
-  };
-
-  const removeTool = (agentId: string, toolId: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      agentNetwork: {
-        ...prev.agentNetwork,
-        agents: prev.agentNetwork.agents.map((a) =>
-          a.id === agentId
-            ? { ...a, tools: a.tools.filter((t) => t.id !== toolId) }
-            : a
-        ),
-      },
-    }));
-  };
-
-  const updateSupervisor = (updates: Partial<Agent>) => {
-    updateFormData('agentNetwork', {
-      supervisorAgent: { ...supervisorAgent, ...updates },
-    });
   };
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 animate-fade-in">
       <div className="space-y-2">
-        <h2 className="text-2xl font-bold text-foreground">Network of Agents</h2>
+        <h2 className="text-2xl font-bold text-foreground">Document Uploads</h2>
         <p className="text-muted-foreground">
-          Configure your agents and their respective tools
+          Upload the required documents for your agentic solution configuration
         </p>
       </div>
 
-      {/* Number of Agents Input */}
-      <div className="p-6 rounded-xl bg-secondary/50 border border-border">
-        <div className="flex items-center justify-between">
-          <div>
-            <Label className="text-lg">Number of Agents</Label>
-            <p className="text-sm text-muted-foreground mt-1">
-              (excluding Supervisor Agent)
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => handleNumAgentsChange(Math.max(0, numAgents - 1))}
-              disabled={numAgents <= 0}
-            >
-              -
-            </Button>
-            <span className="text-2xl font-bold text-primary w-12 text-center">
-              {numAgents}
-            </span>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => handleNumAgentsChange(numAgents + 1)}
-            >
-              +
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      {/* Agents List */}
       <div className="space-y-4">
-        {agents.map((agent, index) => (
-          <Collapsible
-            key={agent.id}
-            open={expandedAgents[agent.id]}
-            onOpenChange={() => toggleAgent(agent.id)}
+        {documents.map((doc) => (
+          <div
+            key={doc.id}
+            className="p-5 rounded-xl border border-border bg-card space-y-4"
           >
-            <div className="rounded-xl border border-border overflow-hidden">
-              <CollapsibleTrigger asChild>
-                <button className="w-full flex items-center justify-between p-4 bg-card hover:bg-secondary/50 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <Bot className="w-5 h-5 text-primary" />
-                    </div>
-                    <div className="text-left">
-                      <span className="font-semibold text-foreground">
-                        {agent.name || `Agent ${index + 1}`}
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex items-start gap-3 flex-1">
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+                  <FileText className="w-5 h-5 text-primary" />
+                </div>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-foreground">{doc.label}</span>
+                    {doc.isRecommendedTemplate && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium">
+                        <Star className="w-3 h-3" />
+                        Recommended Template
                       </span>
-                      <p className="text-sm text-muted-foreground">
-                        {agent.tools.length} tool{agent.tools.length !== 1 ? 's' : ''}
-                      </p>
-                    </div>
-                  </div>
-                  {expandedAgents[agent.id] ? (
-                    <ChevronUp className="w-5 h-5 text-muted-foreground" />
-                  ) : (
-                    <ChevronDown className="w-5 h-5 text-muted-foreground" />
-                  )}
-                </button>
-              </CollapsibleTrigger>
-
-              <CollapsibleContent>
-                <div className="p-6 space-y-6 border-t border-border bg-card/50">
-                  {/* Agent Details */}
-                  <div className="grid gap-4">
-                    <div className="space-y-2">
-                      <Label>Agent Name</Label>
-                      <Input
-                        value={agent.name}
-                        onChange={(e) => updateAgent(agent.id, { name: e.target.value })}
-                        placeholder="e.g., Route Validator"
-                        className="input-focus bg-secondary"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <Label>Agent Instructions + Prompt</Label>
-                        <div className="group relative">
-                          <Info className="w-4 h-4 text-muted-foreground cursor-help" />
-                          <div className="absolute bottom-full left-0 mb-2 hidden group-hover:block w-64 p-3 rounded-lg bg-popover border border-border text-sm z-50">
-                            Provide detailed instructions for how this agent should behave, what it should focus on, and any specific rules it should follow.
-                          </div>
-                        </div>
-                      </div>
-                      <Textarea
-                        value={agent.instructions}
-                        onChange={(e) =>
-                          updateAgent(agent.id, { instructions: e.target.value })
-                        }
-                        placeholder="Describe the agent's role, responsibilities, and behavior..."
-                        rows={4}
-                        className="input-focus bg-secondary resize-none"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Tools Section */}
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <Label className="text-base">Tools</Label>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => addToolToAgent(agent.id)}
-                        className="gap-2"
-                      >
-                        <Plus className="w-4 h-4" />
-                        Add Tool
-                      </Button>
-                    </div>
-
-                    {agent.tools.map((tool, toolIndex) => (
-                      <div
-                        key={tool.id}
-                        className="p-4 rounded-lg bg-secondary/50 border border-border space-y-4"
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <Wrench className="w-4 h-4 text-muted-foreground" />
-                            <span className="text-sm font-medium text-muted-foreground">
-                              Tool {toolIndex + 1}
-                            </span>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => removeTool(agent.id, tool.id)}
-                            className="text-muted-foreground hover:text-destructive h-8 w-8"
-                          >
-                            <X className="w-4 h-4" />
-                          </Button>
-                        </div>
-
-                        <div className="grid gap-4">
-                          <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                              <Label>Tool Name</Label>
-                              <Input
-                                value={tool.name}
-                                onChange={(e) =>
-                                  updateTool(agent.id, tool.id, { name: e.target.value })
-                                }
-                                placeholder="e.g., Data Fetcher"
-                                className="input-focus bg-background"
-                              />
-                            </div>
-
-                            <div className="space-y-2">
-                              <Label>Category</Label>
-                              <Select
-                                value={tool.category}
-                                onValueChange={(value) =>
-                                  updateTool(agent.id, tool.id, { category: value })
-                                }
-                              >
-                                <SelectTrigger className="bg-background">
-                                  <SelectValue placeholder="Select category" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {TOOL_CATEGORIES.map((cat) => (
-                                    <SelectItem key={cat} value={cat}>
-                                      {cat}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </div>
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label>Data Source</Label>
-                            <Select
-                              value={tool.dataSource[0] || ''}
-                              onValueChange={(value) =>
-                                updateTool(agent.id, tool.id, { dataSource: [value] })
-                              }
-                            >
-                              <SelectTrigger className="bg-background">
-                                <SelectValue placeholder="Select data source" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {allFiles.map((file) => (
-                                  <SelectItem key={file} value={file}>
-                                    {file}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label>Tool Instructions</Label>
-                            <Textarea
-                              value={tool.instructions}
-                              onChange={(e) =>
-                                updateTool(agent.id, tool.id, { instructions: e.target.value })
-                              }
-                              placeholder="Describe what this tool does..."
-                              rows={2}
-                              className="input-focus bg-background resize-none"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-
-                    {agent.tools.length === 0 && (
-                      <p className="text-center text-muted-foreground py-4">
-                        No tools added yet. Click "Add Tool" to add one.
-                      </p>
                     )}
                   </div>
+                  <p className="text-sm text-muted-foreground">{doc.description}</p>
+                  <p className="text-xs text-muted-foreground">
+                    Accepted: {doc.acceptedFormats.join(', ')}
+                  </p>
                 </div>
-              </CollapsibleContent>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => removeDocument(doc.id)}
+                className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0"
+              >
+                <X className="w-4 h-4" />
+              </Button>
             </div>
-          </Collapsible>
+
+            {/* File upload area */}
+            <div className="space-y-3">
+              <input
+                type="file"
+                ref={(el) => { fileInputRefs.current[doc.id] = el; }}
+                accept={doc.acceptExtensions}
+                className="hidden"
+                onChange={(e) => handleFileSelect(doc.id, e.target.files?.[0] || null)}
+              />
+
+              {doc.fileName ? (
+                <div className="flex items-center justify-between p-3 rounded-lg bg-secondary/50 border border-border">
+                  <div className="flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-primary" />
+                    <span className="text-sm font-medium text-foreground">{doc.fileName}</span>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      handleFileSelect(doc.id, null);
+                      if (fileInputRefs.current[doc.id]) {
+                        fileInputRefs.current[doc.id]!.value = '';
+                      }
+                    }}
+                    className="text-muted-foreground hover:text-destructive h-8"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => fileInputRefs.current[doc.id]?.click()}
+                  className="w-full p-4 rounded-lg border-2 border-dashed border-border hover:border-primary/50 bg-secondary/30 hover:bg-secondary/50 transition-colors flex flex-col items-center gap-2 cursor-pointer"
+                >
+                  <Upload className="w-5 h-5 text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">
+                    Click to upload {doc.acceptedFormats.join(' or ')}
+                  </span>
+                </button>
+              )}
+
+              {/* Reference link */}
+              <div className="flex items-center gap-2">
+                <ExternalLink className="w-4 h-4 text-muted-foreground shrink-0" />
+                <Label className="text-sm text-muted-foreground shrink-0">Reference:</Label>
+                <input
+                  type="url"
+                  value={doc.referenceLink}
+                  onChange={(e) => updateDocument(doc.id, { referenceLink: e.target.value })}
+                  placeholder="Paste reference link here..."
+                  className="flex-1 text-sm bg-transparent border-b border-border focus:border-primary outline-none py-1 text-foreground placeholder:text-muted-foreground/50 transition-colors"
+                />
+              </div>
+            </div>
+          </div>
         ))}
       </div>
 
-      {/* Supervisor Agent */}
-      <div className="rounded-xl border-2 border-primary/30 overflow-hidden">
-        <div className="p-4 bg-primary/10 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
-            <Crown className="w-5 h-5 text-primary" />
-          </div>
-          <div>
-            <span className="font-semibold text-foreground">Supervisor Agent</span>
-            <p className="text-sm text-muted-foreground">
-              Coordinates all agents in the network
-            </p>
-          </div>
-        </div>
-
-        <div className="p-6 space-y-4 bg-card">
-          <div className="space-y-2">
-            <Label>Agent Name</Label>
-            <Input
-              value={supervisorAgent.name}
-              onChange={(e) => updateSupervisor({ name: e.target.value })}
-              className="input-focus bg-secondary"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Instructions + Prompt</Label>
-            <Textarea
-              value={supervisorAgent.instructions}
-              onChange={(e) => updateSupervisor({ instructions: e.target.value })}
-              rows={4}
-              className="input-focus bg-secondary resize-none"
-            />
-          </div>
+      {/* Add Document Buttons */}
+      <div className="p-5 rounded-xl border border-dashed border-border bg-secondary/20 space-y-3">
+        <Label className="text-sm text-muted-foreground">Add another document:</Label>
+        <div className="flex flex-wrap gap-2">
+          {DEFAULT_DOCUMENTS.map((template) => (
+            <Button
+              key={template.id}
+              variant="outline"
+              size="sm"
+              onClick={() => addDocument(template)}
+              className="gap-2"
+            >
+              <FileText className="w-4 h-4" />
+              {template.label}
+            </Button>
+          ))}
         </div>
       </div>
     </div>
