@@ -50,6 +50,21 @@ export interface AgentNetwork {
   supervisorAgent: Agent;
 }
 
+export interface DocumentUploadItem {
+  id: string;
+  label: string;
+  description: string;
+  acceptedFormats: string[];
+  acceptExtensions: string;
+  fileName: string | null;
+  referenceLink: string;
+  isRecommendedTemplate: boolean;
+}
+
+export interface DocumentUploads {
+  documents: DocumentUploadItem[];
+}
+
 export interface Evaluation {
   id: string;
   question: string;
@@ -70,6 +85,7 @@ export interface OnboardingFormData {
   businessOverview: BusinessOverview;
   dataUpload: DataUpload;
   agentNetwork: AgentNetwork;
+  documentUploads: DocumentUploads;
   evaluations: Evaluation[];
   frontendPortal: FrontendPortal;
 }
@@ -116,6 +132,49 @@ export const TOOL_CATEGORIES = [
   'Validation',
 ] as const;
 
+export const DEFAULT_DOCUMENTS: DocumentUploadItem[] = [
+  {
+    id: 'business-process',
+    label: 'Business Process Overview Document',
+    description: 'Preferred as the recommended template format',
+    acceptedFormats: ['.xlsx', '.docx'],
+    acceptExtensions: '.xlsx,.docx',
+    fileName: null,
+    referenceLink: '',
+    isRecommendedTemplate: true,
+  },
+  {
+    id: 'agents-tools',
+    label: 'Agents-Tools Description & Mapping Document',
+    description: 'Preferred as the recommended template format',
+    acceptedFormats: ['.xlsx', '.docx'],
+    acceptExtensions: '.xlsx,.docx',
+    fileName: null,
+    referenceLink: '',
+    isRecommendedTemplate: true,
+  },
+  {
+    id: 'data-file',
+    label: 'Data',
+    description: '.txt format only, should be as reference format',
+    acceptedFormats: ['.txt'],
+    acceptExtensions: '.txt',
+    fileName: null,
+    referenceLink: '',
+    isRecommendedTemplate: false,
+  },
+  {
+    id: 'system-prompt',
+    label: 'System Prompt',
+    description: '.csv only format, should be as reference format',
+    acceptedFormats: ['.csv'],
+    acceptExtensions: '.csv',
+    fileName: null,
+    referenceLink: '',
+    isRecommendedTemplate: false,
+  },
+];
+
 export const initialFormData: OnboardingFormData = {
   cardDetails: {
     processName: '',
@@ -143,6 +202,9 @@ export const initialFormData: OnboardingFormData = {
       instructions: 'Coordinates all agents in the network, routes tasks to appropriate specialists, and synthesizes final responses.',
       tools: [],
     },
+  },
+  documentUploads: {
+    documents: [...DEFAULT_DOCUMENTS],
   },
   evaluations: [],
   frontendPortal: {

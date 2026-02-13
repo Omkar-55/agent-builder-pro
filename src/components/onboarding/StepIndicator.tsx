@@ -5,7 +5,7 @@ const steps = [
   { number: 1, title: 'Card Details' },
   { number: 2, title: 'Business Overview' },
   { number: 3, title: 'Data Upload' },
-  { number: 4, title: 'Agent Network' },
+  { number: 4, title: 'Documents' },
   { number: 5, title: 'Evaluations' },
   { number: 6, title: 'Frontend Portal' },
 ];
