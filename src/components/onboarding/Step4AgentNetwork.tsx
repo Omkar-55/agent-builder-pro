@@ -73,15 +73,7 @@ export function Step4AgentNetwork() {
                   <FileText className="w-5 h-5 text-primary" />
                 </div>
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="font-semibold text-foreground">{doc.label}</span>
-                    {doc.isRecommendedTemplate && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium">
-                        <Star className="w-3 h-3" />
-                        Recommended Template
-                      </span>
-                    )}
-                  </div>
+                  <span className="font-semibold text-foreground">{doc.label}</span>
                   <p className="text-sm text-muted-foreground">{doc.description}</p>
                   <p className="text-xs text-muted-foreground">
                     Accepted: {doc.acceptedFormats.join(', ')}
