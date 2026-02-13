@@ -21,7 +21,12 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     const saved = localStorage.getItem('rapid-onboarding-form');
     if (saved) {
       const parsed = JSON.parse(saved);
-      return { ...initialFormData, ...parsed };
+      const merged = { ...initialFormData, ...parsed };
+      // Cap evaluations to prevent bloated localStorage data
+      if (merged.evaluations && merged.evaluations.length > 5) {
+        merged.evaluations = merged.evaluations.slice(0, 5);
+      }
+      return merged;
     }
     return initialFormData;
   });
